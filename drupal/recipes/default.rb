@@ -52,23 +52,8 @@ execute "create #{node[:drupal][:db][:database]} database" do
 end
 
 #install drupal
-remote_file "#{node[:drupal][:src]}/drupal-#{node[:drupal][:version]}.tar.gz" do
-  checksum node[:drupal][:checksum]
-  source "http://ftp.drupal.org/files/projects/drupal-#{node[:drupal][:version]}.tar.gz"
-  mode "0644"
-end
-
-directory "#{node[:drupal][:dir]}" do
-  owner "root"
-  group "root"
-  mode "0755"
-  action :create
-end
-
-execute "untar-drupal" do
-  cwd node[:drupal][:dir]
-  command "tar --strip-components 1 -xzf #{node[:drupal][:src]}/drupal-#{node[:drupal][:version]}.tar.gz"
-  creates "#{node[:drupal][:dir]}/index.php"
+drupal_source "#{node[:drupal][:dir]}" do
+  version "#{node[:drupal][:version]}"
 end
 
 if node.has_key?("ec2")
@@ -79,11 +64,6 @@ end
 
 log "Navigate to 'http://#{server_fqdn}/install.php' to complete the drupal installation" do
   action :nothing
-end
-
-directory "#{node[:drupal][:dir]}/sites/default/files" do
-  mode "0777"
-  action :create
 end
 
 template "#{node[:drupal][:dir]}/sites/default/settings.php" do
