@@ -46,14 +46,11 @@ log "Navigate to 'http://#{server_fqdn}/install.php' to complete the drupal inst
   action :nothing
 end
 
-template "#{node[:drupal][:dir]}/sites/default/settings.php" do
-  source "settings.php.erb"
-  mode "0644"
-  variables(
-    :database        => node[:drupal][:db][:database],
-    :user            => node[:drupal][:db][:user],
-    :password        => node[:drupal][:db][:password]
-  )
+drupal_settings "install drupal settings file" do
+  dir node[:drupal][:dir]
+  database node[:drupal][:db][:database]
+  user node[:drupal][:db][:user]
+  password node[:drupal][:db][:password]
   notifies :write, resources(:log => "Navigate to 'http://#{server_fqdn}/install.php' to complete the drupal installation")
 end
 
