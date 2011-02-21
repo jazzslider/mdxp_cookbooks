@@ -24,31 +24,11 @@ include_recipe "mysql::server"
 Gem.clear_paths
 require 'mysql'
 
-execute "mysql-install-drupal-privileges" do
-  command "/usr/bin/mysql -u root -p#{node[:mysql][:server_root_password]} < /etc/mysql/drupal-grants.sql"
-  action :nothing
-end
-
-template "/etc/mysql/drupal-grants.sql" do
-  path "/etc/mysql/drupal-grants.sql"
-  source "grants.sql.erb"
-  owner "root"
-  group "root"
-  mode "0600"
-  variables(
-    :user     => node[:drupal][:db][:user],
-    :password => node[:drupal][:db][:password],
-    :database => node[:drupal][:db][:database]
-  )
-  notifies :run, resources(:execute => "mysql-install-drupal-privileges"), :immediately
-end
-
-execute "create #{node[:drupal][:db][:database]} database" do
-  command "/usr/bin/mysqladmin -u root -p#{node[:mysql][:server_root_password]} create #{node[:drupal][:db][:database]}"
-  not_if do
-    m = Mysql.new("localhost", "root", node[:mysql][:server_root_password])
-    m.list_dbs.include?(node[:drupal][:db][:database])
-  end
+mysql_database node[:drupal][:db][:database]
+mysql_grant "mysql-install-drupal-privileges" do
+  database node[:drupal][:db][:database]
+  user node[:drupal][:db][:user]
+  password node[:drupal][:db][:password]
 end
 
 #install drupal
