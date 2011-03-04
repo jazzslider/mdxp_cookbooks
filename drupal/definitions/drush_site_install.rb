@@ -46,8 +46,6 @@ define :drush_site_install, :action => :install, :dir => nil, :profile => "defau
     # already got a functional database.
     execute drush_command do
       cwd params[:dir]
-      user "www-data"
-      group "www-data"
       not_if "#{node[:drupal][:drush][:dir]}/drush --root=\"#{params[:dir]}\" --uri=\"http://#{params[:sites_subdir]}\" vget install_task | grep 'install_task: \"done\"'"
     end
   else
