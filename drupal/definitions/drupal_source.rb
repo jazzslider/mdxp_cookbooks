@@ -13,7 +13,7 @@ define :drupal_source, :action => :create, :version => "6.20" do
 
     execute "download-drupal-source-to-#{params[:name]}" do
       cwd "/tmp"
-      command "#{node[:drupal][:drush][:dir]}/drush dl drupal-#{params[:version]} --destination=#{File.dirname(params[:name])} --drupal-project-rename=#{File.basename(params[:name])}"
+      command "#{node[:drupal][:drush][:dir]}/drush dl drupal-#{params[:version]} -y --destination=#{File.dirname(params[:name])} --drupal-project-rename=#{File.basename(params[:name])}"
       not_if "#{node[:drupal][:drush][:dir]}/drush -r #{params[:name]} core-status | grep #{params[:version]}"
     end
 
